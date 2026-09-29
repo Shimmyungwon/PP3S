@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>PP3S · 임산부 배려석 양보 유도 시스템</title>
+  <meta name="description" content="임산부 뱃지가 다가오면 배려석 바닥이 분홍빛으로 깜빡이며 양보를 부탁합니다. 팀 양보해조의 2026 임베디드 캡스톤 디자인 프로젝트, PP3S.">
+  <meta name="theme-color" content="#141415">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23141415'/%3E%3Cpath d='M7 23h17V8' fill='none' stroke='%23ff1464' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="css/style.css?v=20">
+</head>
+<body class="is-booting">
+
+<a class="skip-link" href="#main">본문으로 건너뛰기</a>
+
+<!-- 입장 연출: LED 80개가 깨어나고 전광판이 글자를 쓴 뒤 문이 열립니다 -->
+<div class="intro" id="intro" aria-hidden="true">
+  <div class="intro__strip" id="introStrip"></div>
+  <svg class="linewrite intro__word" id="introWord" aria-hidden="true"><text x="0" y="0">임산부 배려석</text></svg>
+  <p class="intro__count"><span id="introCount">00</span> / 80 LED</p>
+  <div class="intro__door intro__door--l"><span class="intro__window"></span></div>
+  <div class="intro__door intro__door--r"><span class="intro__window"></span></div>
+  <button class="intro__skip" id="introSkip" type="button">건너뛰기</button>
+</div>
+
+<!-- 3D 장면: 배려석 모듈과 LED 띠 -->
+<canvas class="stage" id="stage" aria-hidden="true"></canvas>
+
+<!-- 문 위 노선 표시줄 = 내비게이션 -->
+<header class="route" id="route">
+  <a class="route__brand" href="#top" aria-label="PP3S 처음으로">
+    <span>PP3S</span>
+  </a>
+  <nav class="route__line" aria-label="섹션">
+    <ol id="routeList">
+      <li><a href="#top" data-station="top"><span>탑승</span></a></li>
+      <li><a href="#why" data-station="why"><span>이유</span></a></li>
+      <li><a href="#flow" data-station="flow"><span>동작</span></a></li>
+      <li><a href="#assembly" data-station="assembly"><span>조립</span></a></li>
+      <li><a href="#parts" data-station="parts"><span>부품</span></a></li>
+      <li><a href="#system" data-station="system"><span>구성</span></a></li>
+      <li><a href="#web" data-station="web"><span>웹</span></a></li>
+      <li><a href="#build" data-station="build"><span>제작기</span></a></li>
+      <li><a href="#fixes" data-station="fixes"><span>해결</span></a></li>
+      <li><a href="#results" data-station="results"><span>결과</span></a></li>
+      <li><a href="#team" data-station="team"><span>팀</span></a></li>
+    </ol>
+  </nav>
+  <p class="route__now" aria-live="polite"><span class="route__now-k">이번 역</span> <span id="routeNow">탑승</span></p>
+</header>
+
+<main id="main">
+
+  <!-- ── 첫 화면 ─────────────────────────────── -->
+  <section class="hero" id="top" data-scene="hero">
+    <div class="hero__copy">
+      <h1 class="hero__title">
+        <svg class="linewrite hero__mark" id="heroMark" aria-hidden="true"><text x="0" y="0">PP3S</text></svg>
+        <span class="sr-only">PP3S</span>
+        <span class="hero__head">말하지 않아도,<br>자리가 먼저 알아봅니다.</span>
+      </h1>
+      <p class="hero__sub">임산부 뱃지가 다가오면 배려석 바닥이 분홍빛으로 깜빡이며 양보를 부탁합니다. 착석하면 빛이 고정되고, 내리면 스스로 꺼집니다.</p>
+
+      <div class="readout" id="heroReadout" aria-label="시연 신호 표시">
+        <div class="readout__row">
+          <span class="readout__k">뱃지 신호</span>
+          <span class="readout__v"><b id="heroDbm">−95</b> dBm</span>
+        </div>
+        <div class="segs" id="heroSegs" data-n="42" data-th="0.714" aria-hidden="true"><span class="segs__tick"><i>−70</i></span></div>
+        <div class="readout__row">
+          <span class="readout__k">좌석 상태</span>
+          <span class="readout__state" id="heroState" data-state="idle">대기</span>
+        </div>
+      </div>
+
+      <p class="hero__meta">팀 양보해조 · 임베디드 캡스톤 디자인 2026</p>
+    </div>
+    <a class="hero__cue" href="#why">
+      <span>스크롤하여 탑승</span>
+      <svg viewBox="0 0 16 24" aria-hidden="true"><path d="M8 2v18M2 14l6 6 6-6"/></svg>
+    </a>
+  </section>
+
+  <!-- ── 왜 필요한가 ─────────────────────────── -->
+  <section class="why" id="why" data-form="drift" data-scene="ribbon" data-led="idle">
+    <div class="wrap">
+      <h2 class="sr-only">왜 필요한가요</h2>
+      <p class="scrollwrite" data-write>양보는 알아차리는 데서 시작됩니다. 그런데 배려석 앞의 승객은 임산부가 탔다는 걸 모르고, 임산부는 비켜 달라는 말을 꺼내기 어렵습니다.</p>
+
+      <ol class="why__list">
+        <li>
+          <h3>인식 부재</h3>
+          <p>일반 승객이 임산부의 탑승을 알아차리지 못해 배려가 이루어지지 않는 경우가 자주 생깁니다.</p>
+        </li>
+        <li>
+          <h3>심리적 부담</h3>
+          <p>임산부가 직접 양보를 요청해야 하는 상황은 그 자체로 부담이 됩니다.</p>
+        </li>
+        <li>
+          <h3>말 없는 신호</h3>
+          <p>접근과 착석을 시스템이 스스로 알아보고, 말 대신 빛으로 양보를 유도하는 장치가 필요합니다.</p>
+        </li>
+      </ol>
+
+      <p class="scrollwrite scrollwrite--answer" data-write>그래서 PP3S는 부탁하는 말 대신, 빛을 켭니다.</p>
+    </div>
+  </section>
+
+  <!-- ── 동작 원리: 스크롤 = 뱃지와 좌석 사이 거리 ── -->
+  <section class="flow" id="flow" data-form="flow" data-scene="ribbon" data-led="flow">
+    <div class="flow__pin">
+      <div class="flow__grid">
+        <div class="flow__text">
+          <h2 class="h2">네 단계로 스스로 움직이는 좌석</h2>
+          <p class="flow__state" id="flowState" data-state="idle" aria-hidden="true">대기</p>
+          <p class="flow__now" id="flowNow" aria-live="polite">대기 · 평상시에는 조명이 꺼져 있고 웹에는 ‘비어 있음’이 표시됩니다.</p>
+
+          <div class="meter" aria-hidden="true">
+            <div class="meter__scale">
+              <span style="--at:0">−100</span><span style="--at:0.333">−90</span><span style="--at:0.667">−80</span><span class="is-th" style="--at:1">−70</span>
+            </div>
+            <div class="segs segs--flow" id="flowSegs" data-n="40" data-th="1" aria-hidden="true"></div>
+            <p class="meter__v"><b id="flowDbm">−100</b> dBm <span id="flowNfc" class="meter__nfc">NFC 대기</span></p>
+          </div>
+
+          <ol class="steps" id="flowSteps">
+            <li data-step="idle"><b>01 대기</b><span>평상시</span><span>LED 소등 · 웹 ‘비어 있음’</span></li>
+            <li data-step="approach"><b>02 접근</b><span>BLE 신호 −70 dBm 이상</span><span>LED 분홍 점멸 → 양보 유도</span></li>
+            <li data-step="seated"><b>03 착석</b><span>NFC가 NTAG213 UID 수신</span><span>LED 분홍 고정 · 웹 ‘사용 중’</span></li>
+            <li data-step="exit"><b>04 하차</b><span>BLE 신호가 일정 시간 끊김</span><span>LED 점멸 후 소등 · 웹 ‘비어 있음’</span></li>
+          </ol>
+        </div>
+
+        <figure class="flow__photos">
+          <div class="flow__frame">
+            <img src="img/state-idle.webp" data-photo="idle" class="is-on" alt="대기 상태: 조명이 꺼진 배려석과 ‘비어 있음’이 표시된 휴대폰 화면" loading="lazy">
+            <img src="img/state-approach.webp" data-photo="approach" alt="접근 상태: 바닥 조명이 분홍빛으로 켜지고 휴대폰 화면에 접근 중이 표시됨" loading="lazy">
+            <img src="img/state-seated.webp" data-photo="seated" alt="착석 상태: 분홍 조명이 고정되고 휴대폰 화면의 좌석이 사용 중으로 표시됨" loading="lazy">
+            <img src="img/state-exit.webp" data-photo="exit" alt="하차 상태: 조명이 꺼지고 휴대폰 화면이 다시 비어 있음으로 표시됨" loading="lazy">
+          </div>
+          <figcaption>실제 시연 사진 · 시제품과 웹 화면</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 조립: 부품이 모여 시제품이 됩니다 ─────── -->
+  <section class="assembly" id="assembly" data-scene="assembly" data-led="assembly">
+    <div class="assembly__pin">
+      <div class="assembly__text">
+        <h2 class="h2">부품이 모여<br>한 좌석이 됩니다</h2>
+        <ol class="assembly__list" id="asmList">
+          <li data-part="0"><b>바닥 합판</b><span>일반합판 11.5T 재단, 빛이 나올 ‘ㄱ’자 홈 가공, 실크벽지 시트로 지하철 바닥 연출</span></li>
+          <li data-part="1"><b>유백색 아크릴</b><span>바닥 안쪽에 붙여 LED 빛을 고르게 퍼뜨리는 확산판</span></li>
+          <li data-part="2"><b>WS2812B LED 80개</b><span>5m 스트립에서 80개를 잘라 ‘ㄱ’자 홈을 따라 부착, 하나하나 따로 제어</span></li>
+          <li data-part="3"><b>배선 박스 · ESP32 · 전원 보드</b><span>ESP32 LOLIN D32와 HUSB238 PD 보드를 박스 위에 고정, 안쪽에 배선 정리</span></li>
+          <li data-part="4"><b>투명 아크릴 박스</b><span>의자 아래 투시창. 안의 보드가 보이도록 의자와 나사로 결합</span></li>
+          <li data-part="5"><b>분홍 의자</b><span>임산부 배려석을 연출하는 시연용 좌석</span></li>
+          <li data-part="6"><b>PVC 기둥 · 플랜지</b><span>은색 락커로 금속 질감 도색, 배선은 파이프 안으로 통과</span></li>
+          <li data-part="7"><b>NFC 리더기 · 3D 프린팅 케이스</b><span>기둥에 부착한 Grove NFC 모듈. 뱃지를 대면 착석이 확정됩니다</span></li>
+          <li data-part="8"><b>임산부 뱃지</b><span>iBeacon E7 BLE 태그에 NTAG213 NFC 스티커를 직접 부착해 완성</span></li>
+        </ol>
+      </div>
+      <figure class="assembly__photo" id="asmPhoto">
+        <img src="img/prototype-full.webp" alt="완성된 PP3S 시제품: 분홍 의자, 투명 아크릴 박스, 은색 기둥의 NFC 리더기, 바닥의 ㄱ자 분홍 조명" loading="lazy">
+        <figcaption>실제 시제품</figcaption>
+      </figure>
+      <p class="assembly__progress" aria-hidden="true"><span id="asmCount">0</span> / 9</p>
+    </div>
+  </section>
+
+  <!-- ── 부품 인벤토리 (유백색 아크릴 패널) ──────── -->
+  <section class="parts panel" id="parts" data-form="grid" data-scene="ribbon" data-led="seated">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 class="h2">ESP32 한 보드가<br>여섯 모듈을 묶습니다</h2>
+        <p class="lede">BLE로 다가옴을 알고, NFC로 앉았음을 확인하고, LED와 웹으로 알립니다. 칸을 누르면 역할과 연결이 열립니다.</p>
+      </header>
+
+      <div class="inventory" id="inventory">
+        <button class="cell" type="button" aria-expanded="false">
+          
+          <span class="cell__img"><img src="img/part-esp32.webp" alt="" loading="lazy"></span>
+          <span class="cell__name">ESP32 LOLIN D32</span>
+          <span class="cell__role">제어</span>
+          <span class="cell__more">BLE 스캔, NFC 판독, LED 제어, Wi-Fi 상태 전송을 한 보드에서 처리하는 메인 제어 보드.</span>
+        </button>
+        <button class="cell" type="button" aria-expanded="false">
+          
+          <span class="cell__img"><img src="img/part-e7.webp" alt="" loading="lazy"></span>
+          <span class="cell__name">iBeacon E7 BLE 태그</span>
+          <span class="cell__role">접근·이탈 감지</span>
+          <span class="cell__more">임산부 뱃지 안의 BLE 비콘. 신호 세기(RSSI)가 −70 dBm을 넘으면 접근으로 판단합니다. 처음 주문한 Minew E8의 해외 배송이 늦어져 국내 유통 동급 제품으로 바꿨습니다.</span>
+        </button>
+        <button class="cell" type="button" aria-expanded="false">
+          
+          <span class="cell__img"><img src="img/part-ntag.webp" alt="" loading="lazy"></span>
+          <span class="cell__name">NTAG213 NFC 태그</span>
+          <span class="cell__role">착석 확인</span>
+          <span class="cell__more">뱃지에 붙인 NFC 스티커. 리더기에 대면 7바이트 UID가 전달되어 착석이 확정됩니다.</span>
+        </button>
+        <button class="cell" type="button" aria-expanded="false">
+          
+          <span class="cell__img"><img src="img/part-nfc-module.webp" alt="" loading="lazy"></span>
+          <span class="cell__name">Grove NFC 모듈</span>
+          <span class="cell__role">NFC 판독</span>
+          <span class="cell__more">좌석 옆 기둥에 설치한 태그 판독기. 3.3V로 구동하며 5V에 연결하면 모듈이 손상될 수 있습니다.</span>
+        </button>
+        <button class="cell" type="button" aria-expanded="false">
+          
+          <span class="cell__img"><img src="img/part-led.webp" alt="" loading="lazy"></span>
+          <span class="cell__name">WS2812B LED 스트립</span>
+          <span class="cell__role">상태 표시</span>
+          <span class="cell__more">배려석 바닥 조명. 5m(150개) 중 80개를 사용하고 GPIO 22번으로 제어합니다. 분홍 CRGB(255, 20, 100).</span>
+        </button>
+        <button class="cell" type="button" aria-expanded="false">
+          
+          <span class="cell__img"><img src="img/part-power.webp" alt="" loading="lazy"></span>
+          <span class="cell__name">HUSB238 PD 보드 · 5V 5A</span>
+          <span class="cell__role">전원</span>
+          <span class="cell__more">USB-C PD로 LED 스트립에 5V를 따로 공급합니다. ESP32와 GND를 공통으로 연결합니다.</span>
+        </button>
+      </div>
+      <p class="fineprint">부품 사진은 제조사 제품 사진입니다.</p>
+    </div>
+  </section>
+
+  <!-- ── 시스템 구성 ───────────────────────────── -->
+  <section class="system" id="system" data-form="route" data-scene="ribbon" data-led="approach">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 class="h2">신호가 지나가는 길</h2>
+        <p class="lede">뱃지에서 나온 두 신호가 ESP32로 모이고, 결과는 바닥의 빛과 웹 화면으로 동시에 나갑니다.</p>
+      </header>
+
+      <figure class="diagram" id="diagram">
+        <svg viewBox="0 0 1000 420" role="img" aria-labelledby="diagramTitle">
+          <title id="diagramTitle">PP3S 시스템 구성도: 임산부 뱃지의 BLE 태그와 NFC 태그 신호가 ESP32로 들어가고, ESP32는 LED 스트립과 Firebase를 거쳐 웹 화면으로 상태를 내보냅니다.</title>
+          <defs>
+            <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-arrow"/></marker>
+          </defs>
+          <g class="d-paths" fill="none">
+            <path id="p-ble" d="M190 120 C 300 120, 330 190, 420 200" marker-end="url(#arr)"/>
+            <path id="p-nfc" d="M190 300 C 250 300, 270 300, 300 300" marker-end="url(#arr)"/>
+            <path id="p-nfc2" d="M400 300 C 420 300, 420 240, 430 232" marker-end="url(#arr)"/>
+            <path id="p-led" d="M580 180 C 640 150, 660 110, 720 110" marker-end="url(#arr)"/>
+            <path id="p-fb" d="M580 240 C 640 270, 650 300, 720 300" marker-end="url(#arr)"/>
+            <path id="p-web" d="M860 300 C 880 300, 880 300, 890 300" marker-end="url(#arr)"/>
+          </g>
+          <g class="d-pulses">
+            <circle r="5"><animateMotion dur="2.4s" repeatCount="indefinite"><mpath href="#p-ble"/></animateMotion></circle>
+            <circle r="5"><animateMotion dur="1.6s" begin="0.8s" repeatCount="indefinite"><mpath href="#p-nfc"/></animateMotion></circle>
+            <circle r="5"><animateMotion dur="1.6s" begin="0.4s" repeatCount="indefinite"><mpath href="#p-led"/></animateMotion></circle>
+            <circle r="5"><animateMotion dur="2s" begin="1s" repeatCount="indefinite"><mpath href="#p-fb"/></animateMotion></circle>
+          </g>
+          <g class="d-node d-node--badge"><rect x="30" y="70" width="160" height="280" rx="14"/><text x="110" y="100" class="d-cap">임산부 뱃지</text></g>
+          <g class="d-node"><rect x="50" y="118" width="120" height="72" rx="8"/><text x="110" y="150">iBeacon E7</text><text x="110" y="172" class="d-sub">BLE 광고 신호</text></g>
+          <g class="d-node"><rect x="50" y="262" width="120" height="72" rx="8"/><text x="110" y="294">NTAG213</text><text x="110" y="316" class="d-sub">7바이트 UID</text></g>
+          <g class="d-node"><rect x="300" y="266" width="100" height="68" rx="8"/><text x="350" y="296">Grove NFC</text><text x="350" y="318" class="d-sub">기둥 리더기</text></g>
+          <g class="d-node d-node--core"><rect x="420" y="150" width="160" height="120" rx="12"/><text x="500" y="200">ESP32</text><text x="500" y="224" class="d-sub">LOLIN D32</text><text x="500" y="246" class="d-sub">상태 머신</text></g>
+          <g class="d-node d-node--led"><rect x="720" y="72" width="170" height="76" rx="8"/><text x="805" y="106">WS2812B × 80</text><text x="805" y="128" class="d-sub">바닥 조명 · GPIO 22</text></g>
+          <g class="d-node"><rect x="720" y="262" width="140" height="76" rx="8"/><text x="790" y="296">Firebase</text><text x="790" y="318" class="d-sub">Realtime DB · Wi-Fi</text></g>
+          <g class="d-node"><rect x="890" y="262" width="96" height="76" rx="8"/><text x="938" y="296">웹</text><text x="938" y="318" class="d-sub">좌석 상태</text></g>
+          <g class="d-node d-node--power"><rect x="430" y="330" width="140" height="60" rx="8"/><text x="500" y="358">HUSB238 PD</text><text x="500" y="378" class="d-sub">LED 전용 5V</text></g>
+          <path class="d-power" d="M570 360 C 690 360, 700 180, 720 140" fill="none"/>
+        </svg>
+      </figure>
+
+      <div class="fsm">
+        <h3 class="h3">펌웨어 상태 머신</h3>
+        <ol class="fsm__row">
+          <li><code>IDLE_OFF</code><span>소등 · 비어 있음</span></li>
+          <li><code>APPROACH_BLINK</code><span>BLE 근접 → 분홍 점멸</span></li>
+          <li><code>SEATED_ON</code><span>NFC 태그 → 고정 점등 · 사용 중</span></li>
+          <li><code>EXIT_BLINK</code><span>BLE 이탈 → 점멸 후 소등</span></li>
+        </ol>
+        <pre class="code" aria-label="pp3s_main.ino 발췌"><code><span class="c-c">// pp3s_main.ino 발췌</span>
+<span class="c-k">#define</span> LED_PIN       <span class="c-n">22</span>
+<span class="c-k">#define</span> NUM_LEDS      <span class="c-n">80</span>
+CRGB PINK = CRGB(<span class="c-n">255</span>, <span class="c-n">20</span>, <span class="c-n">100</span>);
+<span class="c-k">const int</span> RSSI_THRESHOLD = <span class="c-n">-70</span>;
+
+<span class="c-k">enum</span> SeatState { IDLE_OFF, APPROACH_BLINK, SEATED_ON, EXIT_BLINK };</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 웹 ───────────────────────────────────── -->
+  <section class="web" id="web" data-form="seats" data-scene="ribbon" data-led="seated">
+    <div class="wrap web__grid">
+      <div class="web__text">
+        <h2 class="h2">좌석 상태는<br>웹에서도 실시간으로</h2>
+        <p class="lede">ESP32가 Wi-Fi로 Firebase Realtime Database에 상태를 보내면, 지하철 한 칸과 배려석 한 자리를 그린 웹 화면이 곧바로 바뀝니다.</p>
+        <ul class="ticks">
+          <li>접근하면 좌석이 점멸하고, NFC로 착석을 확인하면 ‘사용 중’으로 고정됩니다.</li>
+          <li>뱃지가 멀어지면 ‘비어 있음’으로 돌아갑니다.</li>
+          <li>PP3S 로고를 길게 누르면 숨겨진 시연 모드가 열려 접근·착석·하차를 직접 확인할 수 있습니다.</li>
+          <li>여러 칸, 여러 좌석으로 늘릴 수 있는 데이터 구조로 설계했습니다.</li>
+        </ul>
+        <div class="web__actions">
+          <a class="btn btn--led" href="https://pp3s-eed98.web.app" target="_blank" rel="noopener">라이브 웹앱 열기
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3h8v8M13 3L3 13"/></svg></a>
+          <span class="url">pp3s-eed98.web.app</span>
+        </div>
+        <p class="fineprint">라이브 웹앱은 실제 데이터베이스와 연결되어 있어, 시연 모드에서 상태를 바꾸면 모든 화면에 그대로 반영됩니다.</p>
+      </div>
+      <div class="phones">
+        <figure class="phone phone--live">
+          <div class="phone__screen">
+            <img src="img/ui-approach.webp" alt="PP3S 웹 화면: 지하철 한 칸의 좌석들 중 배려석이 접근 중으로 표시됨" loading="lazy">
+          </div>
+          <figcaption><span class="live-dot"></span>시연 모드 · 접근</figcaption>
+        </figure>
+        <figure class="phone phone--shot">
+          <div class="phone__screen"><img src="img/ui-seated.webp" alt="시연 모드의 착석 상태: 배려석이 분홍색으로 사용 중 표시됨" loading="lazy"></div>
+          <figcaption>시연 모드 · 착석</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 제작기 ───────────────────────────────── -->
+  <section class="build" id="build" data-form="drift" data-scene="ribbon" data-led="idle">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 class="h2">손으로 만든 한 칸</h2>
+        <p class="lede">옆으로 넘겨 과정을 보세요.</p>
+      </header>
+    </div>
+    <div class="film" id="film" tabindex="0" aria-label="제작 과정 사진, 가로로 스크롤">
+      <figure><img src="img/build-1175.webp" alt="실습실에서 노트북으로 코드를 작성하는 모습" loading="lazy"><figcaption>코드 작성</figcaption></figure>
+      <figure><img src="img/build-1923.webp" alt="브레드보드 위의 ESP32와 모듈 배선" loading="lazy"><figcaption>ESP32 모듈 테스트</figcaption></figure>
+      <figure class="is-wide"><img src="img/build-plywood.webp" alt="장갑을 끼고 합판을 톱으로 재단하는 모습" loading="lazy"><figcaption>바닥 합판 재단</figcaption></figure>
+      <figure class="is-wide"><img src="img/build-3569.webp" alt="팀원들이 바닥에 앉아 ㄱ자 홈을 낸 합판을 맞춰 보는 모습" loading="lazy"><figcaption>‘ㄱ’자 홈 맞추기</figcaption></figure>
+      <figure><img src="img/build-iron.webp" alt="인두기로 PVC 판을 녹여 자르는 모습" loading="lazy"><figcaption>인두기로 PVC 재단</figcaption></figure>
+      <figure><img src="img/build-1577.webp" alt="인두기로 시트에 배선 구멍을 뚫는 모습" loading="lazy"><figcaption>배선 구멍 뚫기</figcaption></figure>
+      <figure><img src="img/build-1430.webp" alt="삼면 브라켓으로 지지대 모서리를 접합한 모습" loading="lazy"><figcaption>지지대 접합</figcaption></figure>
+      <figure><img src="img/build-1585.webp" alt="팀원들이 합판 위에 시트지를 붙이는 모습" loading="lazy"><figcaption>시트지 부착</figcaption></figure>
+      <figure><img src="img/build-1827.webp" alt="지지대 안쪽에 LED 스트립을 붙이는 모습" loading="lazy"><figcaption>LED 스트립 부착</figcaption></figure>
+      <figure><img src="img/build-1831.webp" alt="위에서 본 바닥 지지대와 배선" loading="lazy"><figcaption>바닥 구조와 배선</figcaption></figure>
+      <figure><img src="img/build-1429.webp" alt="플랜지를 단 PVC 기둥" loading="lazy"><figcaption>PVC 기둥과 플랜지</figcaption></figure>
+      <figure class="is-wide"><img src="img/build-chair.webp" alt="팀원들이 분홍 의자와 투명 아크릴 박스를 결합하는 모습" loading="lazy"><figcaption>의자와 아크릴 박스 결합</figcaption></figure>
+      <figure><img src="img/prototype-close.webp" alt="완성품 근접 사진: 기둥, 아크릴 박스, 분홍 조명" loading="lazy"><figcaption>완성</figcaption></figure>
+    </div>
+    <div class="wrap film__nav">
+      <button class="film__btn" type="button" data-film="-1" aria-label="이전 사진"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5"/></svg></button>
+      <div class="film__rail" aria-hidden="true"><span id="filmFill"></span></div>
+      <button class="film__btn" type="button" data-film="1" aria-label="다음 사진"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5"/></svg></button>
+    </div>
+  </section>
+
+  <!-- ── 문제 해결 (유백색 아크릴 패널) ─────────── -->
+  <section class="fixes panel" id="fixes" data-form="drift" data-scene="ribbon" data-led="exit">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 class="h2">막혔던 여덟 번,<br>풀어낸 여덟 번</h2>
+        <p class="lede">계획대로만 되지 않았습니다. 원인을 찾고 해결한 기록입니다.</p>
+      </header>
+      <div class="board" role="table" aria-label="개발 과정 주요 문제와 해결">
+        <div class="board__head" role="row"><span role="columnheader">문제</span><span role="columnheader">원인</span><span role="columnheader">해결</span></div>
+        <div class="board__row" role="row"><span role="cell"><b>LED가 켜지지 않음</b></span><span role="cell">ESP32(3.3V)에는 5V 출력이 없고, USB 전원만으로는 LED 전류가 부족</span><span role="cell">HUSB238 PD 보드로 5V 외부 전원을 따로 공급, GND 공통 연결</span></div>
+        <div class="board__row" role="row"><span role="cell"><b>BLE 태그 배송 지연</b></span><span role="cell">해외 직구한 Minew E8의 배송 기간 과다</span><span role="cell">국내 유통 동급 iBeacon E7로 교체. 기다리는 동안 3D 도안·코드·LED 회로를 먼저 진행</span></div>
+        <div class="board__row" role="row"><span role="cell"><b>업로드 반복 실패</b></span><span role="cell">Mac 환경에서 921600 고속 업로드 시 통신 오류</span><span role="cell">Upload Speed를 115200으로 낮춰 안정화</span></div>
+        <div class="board__row" role="row"><span role="cell"><b>BLE 코드 컴파일 오류</b></span><span role="cell">라이브러리 v3.x에서 BLEScanResults가 참조형에서 포인터형으로 변경</span><span role="cell">포인터 선언과 <code>-&gt;</code> 연산자로 전면 수정</span></div>
+        <div class="board__row" role="row"><span role="cell"><b>연속 시연 중 LED 오작동</b></span><span role="cell">전원 모듈과 NFC 리더기가 가까워 생긴 노이즈로 추정</span><span role="cell">코드 수정과 배선 연장으로 두 모듈 사이 거리 확보</span></div>
+        <div class="board__row" role="row"><span role="cell"><b>NFC 간헐적 인식 불량</b></span><span role="cell">배선 과정의 전극 접촉 불량</span><span role="cell">전극 재연결 후 안정적인 인식 확인</span></div>
+        <div class="board__row" role="row"><span role="cell"><b>외형 재료 반복 품절</b></span><span role="cell">학교 구매 시스템의 재고 부족</span><span role="cell">팀원들이 직접 구매해 바로 대체</span></div>
+        <div class="board__row" role="row"><span role="cell"><b>3D 프린팅 뱃지 미수령</b></span><span role="cell">출력 지원 일정 조율 실패</span><span role="cell">BLE 태그에 NFC 스티커를 직접 붙여 기능이 같은 뱃지 완성</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 결과 ──────────────────────────────────── -->
+  <section class="results" id="results" data-form="column" data-scene="ribbon" data-led="fill">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 class="h2">시연 가능한 시제품,<br>끝까지 완성</h2>
+        <p class="lede">지하철 배려석 구조를 본뜬 실물과 웹 모니터링을 모두 완성해, 접근부터 하차까지 한 번에 시연할 수 있습니다.</p>
+      </header>
+
+      <div class="done" id="done">
+        <p class="done__line">하드웨어 제작, 소프트웨어, 웹, 통합 시연까지 <b>네 갈래 모두 완료</b>했습니다.</p>
+        <span class="dots" aria-hidden="true"></span>
+        <p class="fineprint">결과보고서 기준 진행도 · 점 80개는 바닥 조명의 LED 80개입니다.</p>
+      </div>
+
+      <div class="results__cols">
+        <div>
+          <h3 class="h3">해낸 것</h3>
+          <ul class="ticks">
+            <li>BLE 근접 감지, NFC 착석 확인, LED 상태 표시, 웹 연동을 ESP32 한 보드에서 통합</li>
+            <li>지하철 배려석을 본뜬 실물 시제품과 웹 모니터링 시스템 완성</li>
+            <li>Firebase로 좌석 상태를 원격에서 실시간 확인, 시연 모드로 단독 시연 가능</li>
+            <li>LED 전원 분리, NFC 접촉 불량, 라이브러리 변경 대응 등 실제 임베디드 문제 해결</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="h3">추후 개선사항</h3>
+          <ul class="ticks">
+            <li>여러 좌석·여러 칸으로 확장하고 Firebase 구조 개선</li>
+            <li>노약자석·장애인석 등 교통약자 배려석으로 적용 범위 확대</li>
+            <li>웹 UI 고도화, 사용자 인증과 이력 관리 검토</li>
+            <li>실제 교통 인프라와 연동하는 서비스로의 가능성 탐색</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="concepts">
+        <figure><img src="img/concept-miniature.webp" alt="지하철 객차 내부 미니어처 콘셉트 렌더링, 배려석 아래 분홍 조명" loading="lazy"><figcaption>지하철 미니어처 콘셉트</figcaption></figure>
+        <figure><img src="img/concept-badge.webp" alt="임산부 뱃지 외형 콘셉트와 내부에 들어갈 BLE 태그와 NFC 태그 배치" loading="lazy"><figcaption>뱃지 외형 콘셉트</figcaption></figure>
+        <figure><img src="img/concept-badge-cad.webp" alt="3D 모델링 프로그램에서 설계한 임산부 뱃지 케이스 도안" loading="lazy"><figcaption>뱃지 케이스 3D 도안</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 팀 ────────────────────────────────────── -->
+  <section class="team" id="team" data-form="ring" data-scene="ribbon" data-led="seated">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 class="h2">팀 양보해조</h2>
+        <p class="lede">임베디드 캡스톤 디자인 2026 · 1조</p>
+      </header>
+      <ul class="crew">
+        <li><b>심명원</b><span class="pending">역할 준비 중</span></li>
+        <li><b>김유승</b><span class="pending">역할 준비 중</span></li>
+        <li><b>박정석</b><span class="pending">역할 준비 중</span></li>
+        <li><b>송민혁</b><span class="pending">역할 준비 중</span></li>
+        <li><b>한준영</b><span class="pending">역할 준비 중</span></li>
+        <li><b>박주영</b><span class="pending">역할 준비 중</span></li>
+      </ul>
+
+      <div class="team__grid">
+        <figure class="screen">
+          <div class="screen__frame">
+            <svg class="screen__play" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30"/><path d="M26 21l17 11-17 11z"/></svg>
+            <p class="screen__title">시연 영상</p>
+            <p class="screen__note">영상이 준비되면 이곳에서 재생됩니다</p>
+            <span class="screen__line" aria-hidden="true"></span>
+          </div>
+          <figcaption>시연 영상 · 준비 중</figcaption>
+        </figure>
+        <ul class="links">
+          <li><a class="link" href="https://pp3s-eed98.web.app" target="_blank" rel="noopener"><span>라이브 웹앱</span><span class="link__v">pp3s-eed98.web.app</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3h8v8M13 3L3 13"/></svg></a></li>
+          <li><span class="link is-pending" aria-disabled="true"><span>GitHub 코드 저장소</span><span class="link__v">준비 중</span></span></li>
+          <li><span class="link is-pending" aria-disabled="true"><span>시연 영상</span><span class="link__v">준비 중</span></span></li>
+          <li><a class="link" href="docs/pp3s-report.pdf" target="_blank" rel="noopener"><span>결과보고서 PDF</span><span class="link__v">1.4MB</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3h8v8M13 3L3 13"/></svg></a></li>
+          <li><a class="link" href="docs/pp3s-final-presentation.pdf" target="_blank" rel="noopener"><span>최종 발표자료 PDF</span><span class="link__v">1MB</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3h8v8M13 3L3 13"/></svg></a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="end" data-scene="ribbon" data-led="seated" data-form="lline">
+  <svg class="linewrite end__word" id="endWord" aria-hidden="true"><text x="0" y="0">감사합니다</text></svg>
+  <p class="sr-only">감사합니다</p>
+  <p class="end__line">PP3S · 임산부 배려석 양보 유도 시스템 · 팀 양보해조</p>
+  <p class="end__note">이 시제품은 캡스톤 디자인 과정에서 만든 연구용 시제품이며, 실제 지하철에 설치된 서비스가 아닙니다.</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+<script src="js/scene.js?v=20" defer></script>
+<script src="js/main.js?v=20" defer></script>
+</body>
+</html>
