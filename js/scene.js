@@ -168,22 +168,62 @@
     edges.position.copy(glass.position); g.add(edges);
   }, [0, 1.55, 0]);
 
-  // 5 분홍 의자
+  // 5 분홍 의자: 앉는 면과 등받이가 한 장으로 이어진 셸 의자 (가장자리가 살짝 말려 올라감, 두께 있음)
+  function shellChair(mat) {
+    // 옆에서 본 단면: 앞쪽 끝 → 앉는 면(살짝 오목) → 둥글게 꺾임 → 뒤로 기운 등받이
+    const prof = new T.CatmullRomCurve3([
+      new T.Vector3(0, -0.035, 0.3), new T.Vector3(0, 0.0, 0.2), new T.Vector3(0, -0.03, -0.05),
+      new T.Vector3(0, -0.01, -0.27), new T.Vector3(0, 0.06, -0.42), new T.Vector3(0, 0.2, -0.52),
+      new T.Vector3(0, 0.42, -0.6), new T.Vector3(0, 0.64, -0.7),
+    ], false, 'centripetal');
+    const NU = 40, NV = 110, TH = 0.03;
+    const width = (v) => {
+      let w = 0.82 + 0.08 * Math.sin(Math.min(1, v / 0.5) * Math.PI * 0.5);                            // 뒤로 갈수록 약간 넓어짐
+      if (v < 0.06) w *= 0.8 + 0.2 * Math.sin((v / 0.06) * Math.PI * 0.5);                               // 앞쪽 모서리 둥글게
+      if (v > 0.8) w *= Math.pow(Math.max(0.0, 1 - Math.pow((v - 0.8) / 0.2, 2.6)), 0.42);             // 등받이 윗모서리 크게 둥글게
+      return Math.max(w, 0.06);
+    };
+    const top = [], bot = [];
+    const pt = new T.Vector3(), tg = new T.Vector3();
+    for (let b = 0; b <= NV; b++) {
+      const v = b / NV;
+      prof.getPointAt(v, pt); prof.getTangentAt(v, tg);
+      const ny = -tg.z, nz = tg.y; // 단면의 안쪽(앉는 쪽) 방향
+      const w = width(v);
+      // 등받이일수록 옆이 앞으로 감싸고, 앉는 면은 옆이 살짝 올라감
+      const wrap = (0.045 + 0.06 * Math.min(1, Math.max(0, (v - 0.35) / 0.35))) * (v > 0.8 ? 1 - (v - 0.8) / 0.2 * 0.7 : 1);
+      for (let a = 0; a <= NU; a++) {
+        const u = (a / NU) * 2 - 1;
+        const lift = wrap * Math.pow(Math.abs(u), 3);
+        const x = u * w / 2;
+        // 옆면은 앞쪽(앉는 쪽)으로만 감싸 윗모서리가 들뜨지 않게 합니다
+        const y = pt.y + ny * lift * (v > 0.5 ? 0.35 : 1), z = pt.z + nz * lift;
+        top.push(x, y, z);
+        bot.push(x, y - ny * TH, z - nz * TH);
+      }
+    }
+    const pos = [], idx = [];
+    const add = (arr) => { const base = pos.length / 3; for (let k = 0; k < arr.length; k++) pos.push(arr[k]); return base; };
+    const tb = add(top), bb = add(bot), row = NU + 1;
+    for (let b = 0; b < NV; b++) for (let a = 0; a < NU; a++) {
+      const i0 = b * row + a, i1 = i0 + 1, i2 = i0 + row, i3 = i2 + 1;
+      idx.push(tb + i0, tb + i2, tb + i1, tb + i1, tb + i2, tb + i3);
+      idx.push(bb + i0, bb + i1, bb + i2, bb + i1, bb + i3, bb + i2);
+    }
+    // 가장자리 두께 면
+    const rim = (ia, ib) => { const a0 = add([top[ia * 3], top[ia * 3 + 1], top[ia * 3 + 2], top[ib * 3], top[ib * 3 + 1], top[ib * 3 + 2], bot[ia * 3], bot[ia * 3 + 1], bot[ia * 3 + 2], bot[ib * 3], bot[ib * 3 + 1], bot[ib * 3 + 2]]); idx.push(a0, a0 + 2, a0 + 1, a0 + 1, a0 + 2, a0 + 3); };
+    for (let b = 0; b < NV; b++) { rim(b * row, (b + 1) * row); rim(b * row + NU, (b + 1) * row + NU); }
+    for (let a = 0; a < NU; a++) { rim(a, a + 1); rim(NV * row + a, NV * row + a + 1); }
+    const geo = new T.BufferGeometry();
+    geo.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
+    geo.setIndex(idx); geo.computeVertexNormals();
+    return new T.Mesh(geo, mat);
+  }
   part((g) => {
-    const pinkMat = std(0xe29aac, 0.58, 0, { side: T.DoubleSide });
-    const shape = new T.Shape();
-    const w = 0.9, d = 0.82, r = 0.16;
-    shape.moveTo(-w / 2 + r, -d / 2); shape.lineTo(w / 2 - r, -d / 2); shape.quadraticCurveTo(w / 2, -d / 2, w / 2, -d / 2 + r);
-    shape.lineTo(w / 2, d / 2 - r); shape.quadraticCurveTo(w / 2, d / 2, w / 2 - r, d / 2);
-    shape.lineTo(-w / 2 + r, d / 2); shape.quadraticCurveTo(-w / 2, d / 2, -w / 2, d / 2 - r);
-    shape.lineTo(-w / 2, -d / 2 + r); shape.quadraticCurveTo(-w / 2, -d / 2, -w / 2 + r, -d / 2);
-    const seatGeo = new T.ExtrudeGeometry(shape, { depth: 0.04, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 3 });
-    const s = new T.Mesh(seatGeo, pinkMat);
-    s.rotation.x = -Math.PI / 2; s.position.set(0.06, TOP + 0.64, -0.16); g.add(s);
-    // 등받이: 좌석 뒤쪽 가장자리에 붙어 살짝 뒤로 기웁니다
-    const back = new T.Mesh(new T.CylinderGeometry(0.62, 0.56, 0.6, 40, 1, true, Math.PI * 0.74, Math.PI * 0.52), pinkMat);
-    back.rotation.x = -0.18;
-    back.position.set(0.06, TOP + 0.98, 0.0); g.add(back);
+    const pinkMat = std(0xe29aac, 0.52, 0, { side: T.DoubleSide });
+    const chair = shellChair(pinkMat);
+    chair.position.set(0.06, TOP + 0.66, 0.02);
+    g.add(chair);
   }, [0, 2.45, -0.2]);
 
   // 6 PVC 기둥 + 플랜지 (은색 도색)
