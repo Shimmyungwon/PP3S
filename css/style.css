@@ -516,7 +516,6 @@ body.is-ready .route { transform: none; }
 .web { padding: clamp(120px, 14vw, 200px) 0; }
 .web__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(40px, 6vw, 96px); align-items: center; }
 .web .ticks { margin-top: 28px; max-width: 34em; }
-.web__actions { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-top: 32px; }
 .url { font-family: var(--f-mono); font-size: 14px; color: var(--ink-3); }
 .btn {
   display: inline-flex; align-items: center; gap: 10px;
@@ -528,17 +527,54 @@ body.is-ready .route { transform: none; }
 .btn--led:hover { transform: translateY(-2px); background: #c50d50; box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4); }
 .btn--led:active { transform: translateY(0); }
 
-.phones { position: relative; display: flex; justify-content: center; gap: 28px; align-items: flex-end; }
+.demo { display: flex; flex-direction: column; align-items: center; }
 .phone { margin: 0; }
 .phone__screen {
-  position: relative; width: clamp(200px, 19vw, 270px); aspect-ratio: 390 / 844; overflow: hidden;
-  border-radius: 38px; background: #fff;
+  position: relative; width: clamp(240px, 22vw, 310px); aspect-ratio: 390 / 844; overflow: hidden;
+  border-radius: 40px; background: #f2f3f5;
   box-shadow: 0 0 0 9px #1f1f21, 0 0 0 10px #38383c, 0 40px 80px rgba(0,0,0,0.5);
 }
-.phone__screen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
-.phone--shot { transform: translateY(-40px); }
-.phone--shot .phone__screen { width: clamp(170px, 15vw, 220px); }
-.phone figcaption { margin-top: 22px; text-align: center; font-size: 13px; color: var(--ink-3); display: flex; align-items: center; justify-content: center; gap: 8px; }
+/* 실제 시연용 웹을 390×844 크기로 띄운 뒤 틀에 맞게 줄입니다. 보기 전용이라 눌러도 상태가 바뀌지 않습니다 */
+.phone__screen iframe {
+  position: absolute; left: 0; top: 0; width: 390px; height: 844px; border: 0; background: #f2f3f5;
+  transform-origin: 0 0; transform: scale(var(--s, 0.7)); pointer-events: none;
+  opacity: 0; transition: opacity 0.5s;
+}
+.phone__screen img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top;
+  opacity: 0; transition: opacity 0.45s var(--ease-out);
+}
+.phone__screen[data-view="live"].is-live iframe { opacity: 1; }
+.phone__screen[data-view="live"]:not(.is-live) img.is-fallback,
+.phone__screen[data-view="empty"] img[data-view="empty"],
+.phone__screen[data-view="approach"] img[data-view="approach"],
+.phone__screen[data-view="seated"] img[data-view="seated"],
+.phone__screen[data-view="exit"] img[data-view="exit"] { opacity: 1; }
+.phone figcaption { margin-top: 24px; text-align: center; font-size: 13px; color: var(--ink-3); display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 1.4em; }
+.demo__tabs {
+  display: inline-flex; gap: 2px; margin-top: 18px; padding: 4px; border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--rule-2); background: rgba(28, 28, 30, 0.6);
+}
+.demo__tabs button {
+  border: 0; background: transparent; color: var(--ink-2); font-size: 14px; font-weight: 600;
+  padding: 8px 14px; border-radius: 999px; cursor: pointer; transition: background 0.25s, color 0.25s;
+}
+.demo__tabs button:hover { color: var(--ink); }
+.demo__tabs button[aria-selected="true"] { background: var(--ink); color: var(--car); }
+.demo__tabs button[data-view="live"][aria-selected="true"] { background: var(--led-ui); color: #fff; }
+
+/* 휴대폰으로 열어 보기: QR 카드 */
+.tryit {
+  display: flex; align-items: center; gap: 24px; margin-top: 36px; padding: 20px;
+  border-radius: 18px; background: rgba(28, 28, 30, 0.6); box-shadow: inset 0 0 0 1px var(--rule);
+  max-width: 520px;
+}
+.tryit__qr { flex: 0 0 auto; width: 132px; height: 132px; padding: 10px; border-radius: 12px; background: #fff; }
+.tryit__qr svg { display: block; width: 100%; height: 100%; }
+.tryit__text { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.tryit__title { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+.tryit__desc { margin: 0 0 10px; font-size: 14px; color: var(--ink-2); }
+.tryit .url { margin-top: 4px; }
 .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--led); }
 
 /* ── 제작기 필름 ───────────────────────────── */
@@ -698,9 +734,11 @@ a.link:hover > span:first-child { transform: translateX(8px); }
   .concepts figure:first-child { grid-column: 1 / -1; }
   .crew { grid-template-columns: 1fr 1fr; }
   .team__grid { grid-template-columns: 1fr; }
-  .phones { gap: 18px; }
-  .phone--shot { display: none; }
-  .phone__screen { width: min(64vw, 260px); }
+  .phone__screen { width: min(66vw, 280px); }
+  .demo__tabs button { padding: 7px 10px; font-size: 13px; }
+  /* 이미 휴대폰으로 보고 있으니 QR 대신 버튼만 보입니다 */
+  .tryit { padding: 0; background: none; box-shadow: none; margin-top: 28px; }
+  .tryit__qr, .tryit__desc { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <link rel="stylesheet" href="css/style.css?v=22">
+  <link rel="stylesheet" href="css/style.css?v=24">
 </head>
 <body class="is-booting">
 
@@ -294,31 +294,45 @@ CRGB PINK = CRGB(<span class="c-n">255</span>, <span class="c-n">20</span>, <spa
     <div class="wrap web__grid">
       <div class="web__text">
         <h2 class="h2">좌석 상태는<br>웹에서도 실시간으로</h2>
-        <p class="lede">ESP32가 Wi-Fi로 Firebase Realtime Database에 상태를 보내면, 지하철 한 칸과 배려석 한 자리를 그린 웹 화면이 곧바로 바뀝니다.</p>
+        <p class="lede">ESP32가 Wi-Fi로 Firebase Realtime Database에 상태를 보내면, 지하철 한 칸을 그린 시연용 웹의 배려석이 곧바로 바뀝니다. 오른쪽 화면은 지금 연결된 실제 웹입니다.</p>
         <ul class="ticks">
-          <li>접근하면 좌석이 점멸하고, NFC로 착석을 확인하면 ‘사용 중’으로 고정됩니다.</li>
-          <li>뱃지가 멀어지면 ‘비어 있음’으로 돌아갑니다.</li>
-          <li>PP3S 로고를 길게 누르면 숨겨진 시연 모드가 열려 접근·착석·하차를 직접 확인할 수 있습니다.</li>
-          <li>여러 칸, 여러 좌석으로 늘릴 수 있는 데이터 구조로 설계했습니다.</li>
+          <li>상태 카드가 ‘비어 있음 · 임산부 접근 중 · 착석 확인 · 하차 중’으로 바뀌어 지금 앉아도 되는지 알려 줍니다.</li>
+          <li>좌석 지도의 배려석 옆 ㄱ자 조명이 실제 바닥 조명처럼 접근 때 깜빡이고, 착석하면 켜진 채로 고정됩니다.</li>
+          <li>상태가 바뀔 때마다 ‘최근 기록’에 시각과 함께 남습니다.</li>
+          <li>PP3S 로고를 2초 동안 길게 누르면 숨겨진 시연 모드가 열립니다.</li>
         </ul>
-        <div class="web__actions">
-          <a class="btn btn--led" href="https://pp3s-eed98.web.app" target="_blank" rel="noopener">라이브 웹앱 열기
-            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3h8v8M13 3L3 13"/></svg></a>
-          <span class="url">pp3s-eed98.web.app</span>
-        </div>
-        <p class="fineprint">라이브 웹앱은 실제 데이터베이스와 연결되어 있어, 시연 모드에서 상태를 바꾸면 모든 화면에 그대로 반영됩니다.</p>
-      </div>
-      <div class="phones">
-        <figure class="phone phone--live">
-          <div class="phone__screen">
-            <img src="img/ui-approach.webp" alt="PP3S 웹 화면: 지하철 한 칸의 좌석들 중 배려석이 접근 중으로 표시됨" loading="lazy">
+
+        <div class="tryit">
+          <div class="tryit__qr" id="demoQr" role="img" aria-label="시연용 웹 주소 pp3s-eed98.web.app으로 연결되는 QR 코드"></div>
+          <div class="tryit__text">
+            <p class="tryit__title">휴대폰으로 직접 열어 보기</p>
+            <p class="tryit__desc">카메라로 QR을 비추면 시연용 웹이 열립니다.</p>
+            <a class="btn btn--led" href="https://pp3s-eed98.web.app" target="_blank" rel="noopener">시연용 웹 열기
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3h8v8M13 3L3 13"/></svg></a>
+            <span class="url">pp3s-eed98.web.app</span>
           </div>
-          <figcaption><span class="live-dot"></span>시연 모드 · 접근</figcaption>
+        </div>
+        <p class="fineprint">시연용 웹은 실제 데이터베이스와 연결되어 있어, 시연 모드에서 상태를 바꾸면 접속한 모든 화면에 그대로 반영됩니다.</p>
+      </div>
+
+      <div class="demo">
+        <figure class="phone">
+          <div class="phone__screen" id="demoScreen" data-view="live">
+            <iframe id="demoLive" title="PP3S 시연용 웹 실시간 화면" data-src="https://pp3s-eed98.web.app" tabindex="-1" loading="lazy"></iframe>
+            <img src="img/demo-empty.webp" data-view="empty" class="is-fallback" alt="시연용 웹: 좌석 지도에서 배려석이 비어 있음으로 표시된 화면" loading="lazy">
+            <img src="img/demo-approach.webp" data-view="approach" alt="시연용 웹: 임산부 접근 중, 배려석을 비워 달라는 안내와 깜빡이는 ㄱ자 조명" loading="lazy">
+            <img src="img/demo-seated.webp" data-view="seated" alt="시연용 웹: 착석 확인, 배려석 옆 ㄱ자 조명이 켜진 화면" loading="lazy">
+            <img src="img/demo-exit.webp" data-view="exit" alt="시연용 웹: 하차 중, 잠시 후 자리가 비어요라는 안내" loading="lazy">
+          </div>
+          <figcaption id="demoCaption"><span class="live-dot"></span>실시간 · 지금 연결된 화면</figcaption>
         </figure>
-        <figure class="phone phone--shot">
-          <div class="phone__screen"><img src="img/ui-seated.webp" alt="시연 모드의 착석 상태: 배려석이 분홍색으로 사용 중 표시됨" loading="lazy"></div>
-          <figcaption>시연 모드 · 착석</figcaption>
-        </figure>
+        <div class="demo__tabs" role="tablist" aria-label="시연용 웹 화면 고르기">
+          <button type="button" role="tab" aria-selected="true" data-view="live">실시간</button>
+          <button type="button" role="tab" aria-selected="false" data-view="empty">비어 있음</button>
+          <button type="button" role="tab" aria-selected="false" data-view="approach">접근</button>
+          <button type="button" role="tab" aria-selected="false" data-view="seated">착석</button>
+          <button type="button" role="tab" aria-selected="false" data-view="exit">하차</button>
+        </div>
       </div>
     </div>
   </section>
@@ -464,7 +478,8 @@ CRGB PINK = CRGB(<span class="c-n">255</span>, <span class="c-n">20</span>, <spa
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
-<script src="js/scene.js?v=22" defer></script>
-<script src="js/main.js?v=22" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" defer></script>
+<script src="js/scene.js?v=24" defer></script>
+<script src="js/main.js?v=24" defer></script>
 </body>
 </html>

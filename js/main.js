@@ -316,7 +316,7 @@
         switch (form) {
           case 'grid': rect = rectOf($('#inventory')); break;
           case 'route': rect = rectOf($('#diagram')); vis = phone ? 0 : 0.55; break;
-          case 'seats': rect = rectOf($('.phones')); break;
+          case 'seats': rect = rectOf($('#demoScreen')); break;
           case 'ring': form = 'border'; rect = rectOf($('.screen__frame')); break;
           case 'lline': form = 'bar'; rect = rectOf($('#endWord')); break;
           default:
@@ -334,6 +334,7 @@
   }
   // 요소의 화면 위치를 화면 비율(0~1)로 바꿉니다
   function rectOf(el, grow = 1) {
+    if (!el) return { cx: 0.83, cy: 0.5, w: 0.2, h: 0.55 }; // 요소가 없으면 오른쪽 기본 자리
     const r = el.getBoundingClientRect(), W = window.innerWidth, H = window.innerHeight;
     return { cx: (r.left + r.width / 2) / W, cy: (r.top + r.height / 2) / H, w: (r.width / W) * grow, h: (r.height / H) * grow };
   }
@@ -376,16 +377,60 @@
     if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); $(`[data-film="${e.key === 'ArrowRight' ? 1 : -1}"]`).click(); }
   });
 
+  // ── 시연용 웹: 실시간 화면 · 상태별 예시 · QR ──
+  const DEMO_URL = 'https://pp3s-eed98.web.app';
+  const demoScreen = $('#demoScreen'), demoLive = $('#demoLive'), demoCaption = $('#demoCaption');
+  const DEMO_CAP = {
+    live: '실시간 · 지금 연결된 화면', empty: '예시 화면 · 비어 있음', approach: '예시 화면 · 임산부 접근 중',
+    seated: '예시 화면 · 착석 확인', exit: '예시 화면 · 하차 중',
+  };
+  function setDemoView(view) {
+    demoScreen.dataset.view = view;
+    $$('.demo__tabs button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.view === view)));
+    const live = view === 'live' && demoScreen.classList.contains('is-live');
+    demoCaption.innerHTML = view === 'live'
+      ? (live ? '<span class="live-dot"></span>' + DEMO_CAP.live : '실시간 화면을 불러오는 중 · 예시 화면')
+      : DEMO_CAP[view];
+  }
+  $$('.demo__tabs button').forEach((b) => b.addEventListener('click', () => setDemoView(b.dataset.view)));
+  function fitDemo() { demoLive.style.setProperty('--s', (demoScreen.getBoundingClientRect().width / 390).toFixed(4)); }
+  // 섹션에 가까워질 때만 실제 웹을 불러옵니다 (처음부터 데이터베이스에 연결하지 않도록)
+  new IntersectionObserver((entries, io) => {
+    if (!entries[0].isIntersecting) return;
+    io.disconnect();
+    fitDemo();
+    demoLive.addEventListener('load', () => setTimeout(() => {
+      demoScreen.classList.add('is-live');
+      if (demoScreen.dataset.view === 'live') setDemoView('live');
+    }, 1200), { once: true });
+    demoLive.src = demoLive.dataset.src;
+  }, { rootMargin: '600px' }).observe(demoScreen);
+  setDemoView('live');
+
+  function drawQr() {
+    const box = $('#demoQr');
+    if (!box || !window.qrcode) return;
+    const qr = window.qrcode(0, 'M');
+    qr.addData(DEMO_URL); qr.make();
+    const size = qr.getModuleCount();
+    let d = '';
+    for (let row = 0; row < size; row++) {
+      for (let col = 0; col < size; col++) if (qr.isDark(row, col)) d += 'M' + col + ' ' + row + 'h1v1h-1z';
+    }
+    box.innerHTML = '<svg viewBox="0 0 ' + size + ' ' + size + '" shape-rendering="crispEdges" aria-hidden="true"><path d="' + d + '" fill="#141415"/></svg>';
+  }
+
   // ── 크기 변경 ───────────────────────────────
   let rz;
   window.addEventListener('resize', () => {
     clearTimeout(rz);
-    rz = setTimeout(() => { filmRail(); }, 150);
+    rz = setTimeout(() => { filmRail(); fitDemo(); }, 150);
   });
 
   // ── 시작 ────────────────────────────────────
   fontsReady.then(() => {
     filmRail();
+    drawQr();
     requestAnimationFrame(frame);
     if (reduce || location.hash) { finishIntro(); } else { runIntro(); }
   });
