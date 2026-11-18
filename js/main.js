@@ -174,10 +174,10 @@
   // ── 동작 원리 (스크롤 = 거리) ───────────────
   const flow = { sec: $('#flow'), state: $('#flowState'), frame: $('.flow__frame'), now: $('#flowNow'), dbm: $('#flowDbm'), meter: new SegMeter($('#flowSegs')), nfc: $('#flowNfc'), steps: $$('#flowSteps li'), photos: $$('.flow__frame img'), last: '' };
   const FLOW_TEXT = {
-    idle: ['대기', '대기 · 평상시에는 조명이 꺼져 있고<br>웹에는 ‘비어 있음’이 표시됩니다.'],
-    approach: ['접근', '접근 · 뱃지 신호가 −70 dBm을 넘으면<br>바닥 조명이 분홍빛으로 깜빡이며 양보를 부탁합니다.'],
-    seated: ['착석', '착석 · 기둥의 NFC 리더기에 뱃지를 대면 빛이 고정되고,<br>웹의 좌석이 ‘사용 중’으로 바뀝니다.'],
-    exit: ['하차', '하차 · 뱃지 신호가 멀어지면 내린 것으로 보고,<br>깜빡인 뒤 조명을 끄고 ‘비어 있음’으로 돌립니다.'],
+    idle: ['대기', '대기 · 평상시에는<br class="p-br">조명이 꺼져 있고<br>웹에는 ‘비어 있음’이 표시됩니다.'],
+    approach: ['접근', '접근 · 뱃지 신호가 −70 dBm을 넘으면<br>바닥 조명이 분홍빛으로 깜빡이며<br class="m-br">양보를 부탁합니다.'],
+    seated: ['착석', '착석 · 기둥의 NFC 리더기에 뱃지를 대면<br class="m-br">빛이 고정되고,<br>웹의 좌석이 ‘사용 중’으로 바뀝니다.'],
+    exit: ['하차', '하차 · 뱃지 신호가 멀어지면 내린 것으로 보고,<br>깜빡인 뒤 조명을 끄고<br class="m-br">‘비어 있음’으로 돌립니다.'],
   };
   function flowAt(p) {
     let dbm, st, nfc = false, photo;
@@ -327,6 +327,13 @@
           default:
             if (cur.id === 'fixes') rect = { cx: 0.5, cy: 0.55, w: 0.8, h: 0.8 };
             else if (cur.id === 'build') { rect = { cx: 0.8, cy: 0.24, w: 0.26, h: 0.3 }; if (phone) vis = 0; }
+            else if (cur.id === 'why') {
+              // 글자 영역 오른쪽에 남는 공간을 재서 그 안에 LED 무리를 둡니다
+              const W = window.innerWidth, right = Math.max($('.why .scrollwrite').getBoundingClientRect().right, $('.why__list').getBoundingClientRect().right);
+              const left = right + 48, room = W - left - 24;
+              rect = room > 200 ? { cx: (left + room / 2) / W, cy: 0.5, w: room / W * 0.8, h: 0.55 } : { cx: 0.85, cy: 0.5, w: 0.18, h: 0.55 };
+              if (phone) vis = 0; else if (room <= 200) vis = 0.35;
+            }
             else { rect = { cx: 0.83, cy: 0.5, w: 0.2, h: 0.55 }; if (phone) vis = 0; }
         }
       }

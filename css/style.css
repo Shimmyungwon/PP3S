@@ -684,13 +684,13 @@ a.link:hover > span:first-child { transform: translateX(8px); }
 .end__note { margin: 10px 0 0; color: var(--ink-3); font-size: 13px; max-width: none; }
 
 /* 데스크톱: LED 무리가 머무는 오른쪽 자리를 비워 둡니다 */
-@media (min-width: 1081px) {
-  .why .wrap { padding-right: calc(var(--gutter) + 26vw); }
-}
+.why .wrap > * { max-width: 920px; }
 
 /* 휴대폰에서만 쓰는 줄바꿈 자리 */
 .m-br { display: none; }
-@media (max-width: 720px) { .m-br { display: inline; } }
+@media (max-width: 1080px) { .m-br { display: inline; } }
+.p-br { display: none; }
+@media (max-width: 480px) { .p-br { display: inline; } }
 
 /* ── 반응형 ────────────────────────────────── */
 @media (max-width: 1080px) {

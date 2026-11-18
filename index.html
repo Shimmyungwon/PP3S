@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <link rel="stylesheet" href="css/style.css?v=26">
+  <link rel="stylesheet" href="css/style.css?v=29">
 </head>
 <body class="is-booting">
 
@@ -64,7 +64,7 @@
         <span class="hero__head">임산부 배려석<br>양보 유도 시스템</span>
         <span class="hero__en">Pregnancy Priority Seat Support System</span>
       </h1>
-      <p class="hero__sub">임산부 뱃지가 다가오면 배려석 바닥이<br>분홍빛으로 깜빡이며 양보를 부탁합니다.<br>착석하면 빛이 고정되고, 내리면 스스로 꺼집니다.</p>
+      <p class="hero__sub">임산부 뱃지가 다가오면 배려석 바닥이<br>분홍빛으로 깜빡이며 양보를 부탁합니다.<br>착석하면 빛이 고정되고, 하차하면 스스로 꺼집니다.</p>
 
       <div class="readout" id="heroReadout" aria-label="시연 신호 표시">
         <div class="readout__row">
@@ -118,7 +118,7 @@
         <div class="flow__text">
           <h2 class="h2">대기부터 하차까지</h2>
           <p class="flow__state" id="flowState" data-state="idle" aria-hidden="true">대기</p>
-          <p class="flow__now" id="flowNow" aria-live="polite">대기 · 평상시에는 조명이 꺼져 있고 웹에는 ‘비어 있음’이 표시됩니다.</p>
+          <p class="flow__now" id="flowNow" aria-live="polite">대기 · 평상시에는<br class="p-br">조명이 꺼져 있고<br>웹에는 ‘비어 있음’이 표시됩니다.</p>
 
           <div class="meter" aria-hidden="true">
             <div class="meter__scale">
@@ -299,7 +299,7 @@ CRGB PINK = CRGB(<span class="c-n">255</span>, <span class="c-n">20</span>, <spa
         <ul class="ticks">
           <li>상태 카드가 ‘비어 있음 · 임산부 접근 중 ·<br>착석 확인 · 하차 중’으로 바뀌어<br>지금 앉아도 되는지 알려 줍니다.</li>
           <li>좌석 지도의 배려석 옆 ㄱ자 조명이<br class="m-br">실제 바닥 조명처럼<br>접근 때 깜빡이고,<br class="m-br">착석하면 켜진 채로 고정됩니다.</li>
-          <li>상태가 바뀔 때마다 ‘최근 기록’에 시각과 함께 남습니다.</li>
+          <li>상태가 바뀔 때마다 ‘최근 기록’에<br class="m-br">시각과 함께 남습니다.</li>
           <li>PP3S 로고를 2초 동안 길게 누르면<br>숨겨진 시연 모드가 열립니다.</li>
         </ul>
 
@@ -408,18 +408,18 @@ CRGB PINK = CRGB(<span class="c-n">255</span>, <span class="c-n">20</span>, <spa
           <h3 class="h3">해낸 것</h3>
           <ul class="ticks">
             <li>BLE 근접 감지, NFC 착석 확인,<br class="m-br">LED 상태 표시, 웹 연동을<br>ESP32 한 보드에서 통합</li>
-            <li>지하철 배려석을 본뜬 실물 시제품과 웹 모니터링 시스템 완성</li>
-            <li>Firebase로 좌석 상태를 원격에서 실시간 확인,<br>시연 모드로 단독 시연 가능</li>
+            <li>지하철 배려석을 본뜬 실물 시제품과<br class="m-br">웹 모니터링 시스템 완성</li>
+            <li>Firebase로 좌석 상태를<br class="m-br">원격에서 실시간 확인,<br>시연 모드로 단독 시연 가능</li>
             <li>LED 전원 분리, NFC 접촉 불량,<br class="m-br">라이브러리 변경 대응 등<br>실제 임베디드 문제 해결</li>
           </ul>
         </div>
         <div>
           <h3 class="h3">추후 개선사항</h3>
           <ul class="ticks">
-            <li>여러 좌석·여러 칸으로 확장하고 Firebase 구조 개선</li>
-            <li>노약자석·장애인석 등 교통약자 배려석으로 적용 범위 확대</li>
+            <li>여러 좌석·여러 칸으로 확장하고<br class="m-br">Firebase 구조 개선</li>
+            <li>노약자석·장애인석 등<br class="m-br">교통약자 배려석으로 적용 범위 확대</li>
             <li>웹 UI 고도화, 사용자 인증과 이력 관리 검토</li>
-            <li>실제 교통 인프라와 연동하는 서비스로의 가능성 탐색</li>
+            <li>실제 교통 인프라와 연동하는<br class="m-br">서비스로의 가능성 탐색</li>
           </ul>
         </div>
       </div>
@@ -480,7 +480,7 @@ CRGB PINK = CRGB(<span class="c-n">255</span>, <span class="c-n">20</span>, <spa
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" defer></script>
-<script src="js/scene.js?v=26" defer></script>
-<script src="js/main.js?v=26" defer></script>
+<script src="js/scene.js?v=29" defer></script>
+<script src="js/main.js?v=29" defer></script>
 </body>
 </html>
