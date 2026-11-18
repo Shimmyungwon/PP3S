@@ -419,6 +419,19 @@
   }, { rootMargin: '600px' }).observe(demoScreen);
   setDemoView('live');
 
+  // 컨셉 영상: 화면에 보일 때만 불러와서 소리 없이 반복 재생, 벗어나면 멈춤
+  const cvid = $('#conceptVideo');
+  if (cvid) {
+    if (reduce) cvid.controls = true;
+    new IntersectionObserver((entries) => {
+      const on = entries[0].isIntersecting;
+      if (on && !cvid.src) cvid.src = cvid.dataset.src;
+      if (reduce) return;
+      if (on) cvid.play().catch(() => { cvid.controls = true; });
+      else cvid.pause();
+    }, { threshold: 0.25 }).observe(cvid);
+  }
+
   function drawQr() {
     const box = $('#demoQr');
     if (!box || !window.qrcode) return;
