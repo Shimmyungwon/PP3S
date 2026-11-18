@@ -100,16 +100,21 @@
 
   // ── 스크롤 글쓰기 ──────────────────────────
   const writes = $$('[data-write]').map((el) => {
-    const text = el.textContent.trim();
-    el.setAttribute('aria-label', text);
+    // <br>로 나눈 줄을 그대로 지키면서 글자마다 span을 씌웁니다
+    const lines = el.innerHTML.split(/<br\s*\/?>/i).map((h) => { const d = document.createElement('div'); d.innerHTML = h; return d.textContent.trim(); });
+    el.setAttribute('aria-label', lines.join(' '));
     el.textContent = '';
     const chars = [];
-    text.split(/(\s+)/).forEach((word) => {
-      if (/^\s+$/.test(word)) { el.appendChild(document.createTextNode(' ')); return; }
-      const w = document.createElement('span');
-      w.style.whiteSpace = 'nowrap'; w.setAttribute('aria-hidden', 'true');
-      Array.from(word).forEach((ch) => { const s = document.createElement('span'); s.className = 'ch'; s.textContent = ch; w.appendChild(s); chars.push(s); });
-      el.appendChild(w);
+    lines.forEach((line, li) => {
+      if (li > 0) el.appendChild(document.createElement('br'));
+      line.split(/(\s+)/).forEach((word) => {
+        if (!word) return;
+        if (/^\s+$/.test(word)) { el.appendChild(document.createTextNode(' ')); return; }
+        const w = document.createElement('span');
+        w.style.whiteSpace = 'nowrap'; w.setAttribute('aria-hidden', 'true');
+        Array.from(word).forEach((ch) => { const s = document.createElement('span'); s.className = 'ch'; s.textContent = ch; w.appendChild(s); chars.push(s); });
+        el.appendChild(w);
+      });
     });
     return { el, chars, last: -1 };
   });
@@ -169,10 +174,10 @@
   // ── 동작 원리 (스크롤 = 거리) ───────────────
   const flow = { sec: $('#flow'), state: $('#flowState'), frame: $('.flow__frame'), now: $('#flowNow'), dbm: $('#flowDbm'), meter: new SegMeter($('#flowSegs')), nfc: $('#flowNfc'), steps: $$('#flowSteps li'), photos: $$('.flow__frame img'), last: '' };
   const FLOW_TEXT = {
-    idle: ['대기', '대기 · 평상시에는 조명이 꺼져 있고 웹에는 ‘비어 있음’이 표시됩니다.'],
-    approach: ['접근', '접근 · 뱃지 신호가 −70 dBm을 넘으면 바닥 조명이 분홍빛으로 깜빡이며 양보를 부탁합니다.'],
-    seated: ['착석', '착석 · 기둥의 NFC 리더기에 뱃지를 대면 빛이 고정되고, 웹의 좌석이 ‘사용 중’으로 바뀝니다.'],
-    exit: ['하차', '하차 · 뱃지 신호가 멀어지면 내린 것으로 보고, 깜빡인 뒤 조명을 끄고 ‘비어 있음’으로 돌립니다.'],
+    idle: ['대기', '대기 · 평상시에는 조명이 꺼져 있고<br>웹에는 ‘비어 있음’이 표시됩니다.'],
+    approach: ['접근', '접근 · 뱃지 신호가 −70 dBm을 넘으면<br>바닥 조명이 분홍빛으로 깜빡이며 양보를 부탁합니다.'],
+    seated: ['착석', '착석 · 기둥의 NFC 리더기에 뱃지를 대면 빛이 고정되고,<br>웹의 좌석이 ‘사용 중’으로 바뀝니다.'],
+    exit: ['하차', '하차 · 뱃지 신호가 멀어지면 내린 것으로 보고,<br>깜빡인 뒤 조명을 끄고 ‘비어 있음’으로 돌립니다.'],
   };
   function flowAt(p) {
     let dbm, st, nfc = false, photo;
@@ -201,7 +206,7 @@
       flow.state.textContent = FLOW_TEXT[f.st][0];
       flow.state.dataset.state = f.st;
       flow.state.classList.remove('is-swap'); void flow.state.offsetWidth; flow.state.classList.add('is-swap');
-      flow.now.textContent = FLOW_TEXT[f.st][1];
+      flow.now.innerHTML = FLOW_TEXT[f.st][1];
       flow.steps.forEach((li) => li.classList.toggle('is-now', li.dataset.step === f.st));
       flow.photos.forEach((img) => img.classList.toggle('is-on', img.dataset.photo === f.photo));
     }

@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <link rel="stylesheet" href="css/style.css?v=24">
+  <link rel="stylesheet" href="css/style.css?v=26">
 </head>
 <body class="is-booting">
 
@@ -61,9 +61,10 @@
       <h1 class="hero__title">
         <svg class="linewrite hero__mark" id="heroMark" aria-hidden="true"><text x="0" y="0">PP3S</text></svg>
         <span class="sr-only">PP3S</span>
-        <span class="hero__head">말하지 않아도,<br>자리가 먼저 알아봅니다.</span>
+        <span class="hero__head">임산부 배려석<br>양보 유도 시스템</span>
+        <span class="hero__en">Pregnancy Priority Seat Support System</span>
       </h1>
-      <p class="hero__sub">임산부 뱃지가 다가오면 배려석 바닥이 분홍빛으로 깜빡이며 양보를 부탁합니다. 착석하면 빛이 고정되고, 내리면 스스로 꺼집니다.</p>
+      <p class="hero__sub">임산부 뱃지가 다가오면 배려석 바닥이<br>분홍빛으로 깜빡이며 양보를 부탁합니다.<br>착석하면 빛이 고정되고, 내리면 스스로 꺼집니다.</p>
 
       <div class="readout" id="heroReadout" aria-label="시연 신호 표시">
         <div class="readout__row">
@@ -89,7 +90,7 @@
   <section class="why" id="why" data-form="drift" data-scene="ribbon" data-led="idle">
     <div class="wrap">
       <h2 class="sr-only">왜 필요한가요</h2>
-      <p class="scrollwrite" data-write>양보는 알아차리는 데서 시작됩니다. 그런데 배려석 앞의 승객은 임산부가 탔다는 걸 모르고, 임산부는 비켜 달라는 말을 꺼내기 어렵습니다.</p>
+      <p class="scrollwrite" data-write>지하철 임산부 배려석은 일반 승객이<br>임산부의 탑승을 알아차리지 못하거나,<br>임산부가 직접 양보를 요청하기 어려워<br>제대로 쓰이지 못하는 경우가 많습니다.</p>
 
       <ol class="why__list">
         <li>
@@ -101,12 +102,12 @@
           <p>임산부가 직접 양보를 요청해야 하는 상황은 그 자체로 부담이 됩니다.</p>
         </li>
         <li>
-          <h3>말 없는 신호</h3>
+          <h3>자동 인식의 필요성</h3>
           <p>접근과 착석을 시스템이 스스로 알아보고, 말 대신 빛으로 양보를 유도하는 장치가 필요합니다.</p>
         </li>
       </ol>
 
-      <p class="scrollwrite scrollwrite--answer" data-write>그래서 PP3S는 부탁하는 말 대신, 빛을 켭니다.</p>
+      <p class="scrollwrite scrollwrite--answer" data-write>그래서 직접 말하지 않아도<br>양보를 유도할 수 있는<br>시스템을 개발하였습니다.</p>
     </div>
   </section>
 
@@ -115,7 +116,7 @@
     <div class="flow__pin">
       <div class="flow__grid">
         <div class="flow__text">
-          <h2 class="h2">네 단계로 스스로 움직이는 좌석</h2>
+          <h2 class="h2">대기부터 하차까지</h2>
           <p class="flow__state" id="flowState" data-state="idle" aria-hidden="true">대기</p>
           <p class="flow__now" id="flowNow" aria-live="polite">대기 · 평상시에는 조명이 꺼져 있고 웹에는 ‘비어 있음’이 표시됩니다.</p>
 
@@ -152,7 +153,7 @@
   <section class="assembly" id="assembly" data-scene="assembly" data-led="assembly">
     <div class="assembly__pin">
       <div class="assembly__text">
-        <h2 class="h2">부품이 모여<br>한 좌석이 됩니다</h2>
+        <h2 class="h2">배려석 모듈 구성</h2>
         <ol class="assembly__list" id="asmList">
           <li data-part="0"><b>바닥 합판</b><span>일반합판 11.5T 재단, 빛이 나올 ‘ㄱ’자 홈 가공, 실크벽지 시트로 지하철 바닥 연출</span></li>
           <li data-part="1"><b>유백색 아크릴</b><span>바닥 안쪽에 붙여 LED 빛을 고르게 퍼뜨리는 확산판</span></li>
@@ -177,8 +178,8 @@
   <section class="parts panel" id="parts" data-form="grid" data-scene="ribbon" data-led="seated">
     <div class="wrap">
       <header class="sec-head">
-        <h2 class="h2">ESP32 한 보드가<br>여섯 모듈을 묶습니다</h2>
-        <p class="lede">BLE로 다가옴을 알고, NFC로 앉았음을 확인하고, LED와 웹으로 알립니다. 칸을 누르면 역할과 연결이 열립니다.</p>
+        <h2 class="h2">주요 부품 6가지</h2>
+        <p class="lede">ESP32 하나로 BLE 감지, NFC 인식,<br class="m-br">LED 제어, Firebase 전송을 모두 처리합니다.<br>칸을 누르면 부품별 역할을 볼 수 있습니다.</p>
       </header>
 
       <div class="inventory" id="inventory">
@@ -233,8 +234,8 @@
   <section class="system" id="system" data-form="route" data-scene="ribbon" data-led="approach">
     <div class="wrap">
       <header class="sec-head">
-        <h2 class="h2">신호가 지나가는 길</h2>
-        <p class="lede">뱃지에서 나온 두 신호가 ESP32로 모이고, 결과는 바닥의 빛과 웹 화면으로 동시에 나갑니다.</p>
+        <h2 class="h2">시스템 구성</h2>
+        <p class="lede">뱃지의 BLE 신호와 NFC 태그 정보를 ESP32가 받아,<br>LED 조명과 웹 화면에 좌석 상태를 표시합니다.</p>
       </header>
 
       <figure class="diagram" id="diagram">
@@ -294,12 +295,12 @@ CRGB PINK = CRGB(<span class="c-n">255</span>, <span class="c-n">20</span>, <spa
     <div class="wrap web__grid">
       <div class="web__text">
         <h2 class="h2">좌석 상태는<br>웹에서도 실시간으로</h2>
-        <p class="lede">ESP32가 Wi-Fi로 Firebase Realtime Database에 상태를 보내면, 지하철 한 칸을 그린 시연용 웹의 배려석이 곧바로 바뀝니다. 오른쪽 화면은 지금 연결된 실제 웹입니다.</p>
+        <p class="lede">ESP32가 Wi-Fi로 Firebase Realtime Database에<br>상태를 보내면, 지하철 한 칸을 그린<br>시연용 웹의 배려석이 곧바로 바뀝니다.<br>오른쪽 화면은 지금 연결된 실제 웹입니다.</p>
         <ul class="ticks">
-          <li>상태 카드가 ‘비어 있음 · 임산부 접근 중 · 착석 확인 · 하차 중’으로 바뀌어 지금 앉아도 되는지 알려 줍니다.</li>
-          <li>좌석 지도의 배려석 옆 ㄱ자 조명이 실제 바닥 조명처럼 접근 때 깜빡이고, 착석하면 켜진 채로 고정됩니다.</li>
+          <li>상태 카드가 ‘비어 있음 · 임산부 접근 중 ·<br>착석 확인 · 하차 중’으로 바뀌어<br>지금 앉아도 되는지 알려 줍니다.</li>
+          <li>좌석 지도의 배려석 옆 ㄱ자 조명이<br class="m-br">실제 바닥 조명처럼<br>접근 때 깜빡이고,<br class="m-br">착석하면 켜진 채로 고정됩니다.</li>
           <li>상태가 바뀔 때마다 ‘최근 기록’에 시각과 함께 남습니다.</li>
-          <li>PP3S 로고를 2초 동안 길게 누르면 숨겨진 시연 모드가 열립니다.</li>
+          <li>PP3S 로고를 2초 동안 길게 누르면<br>숨겨진 시연 모드가 열립니다.</li>
         </ul>
 
         <div class="tryit">
@@ -312,7 +313,7 @@ CRGB PINK = CRGB(<span class="c-n">255</span>, <span class="c-n">20</span>, <spa
             <span class="url">pp3s-eed98.web.app</span>
           </div>
         </div>
-        <p class="fineprint">시연용 웹은 실제 데이터베이스와 연결되어 있어, 시연 모드에서 상태를 바꾸면 접속한 모든 화면에 그대로 반영됩니다.</p>
+        <p class="fineprint">시연용 웹은 실제 데이터베이스와 연결되어 있어,<br>시연 모드에서 상태를 바꾸면<br class="m-br">접속한 모든 화면에 그대로 반영됩니다.</p>
       </div>
 
       <div class="demo">
@@ -341,7 +342,7 @@ CRGB PINK = CRGB(<span class="c-n">255</span>, <span class="c-n">20</span>, <spa
   <section class="build" id="build" data-form="drift" data-scene="ribbon" data-led="idle">
     <div class="wrap">
       <header class="sec-head">
-        <h2 class="h2">손으로 만든 한 칸</h2>
+        <h2 class="h2">외형 제작 과정</h2>
         <p class="lede">옆으로 넘겨 과정을 보세요.</p>
       </header>
     </div>
@@ -371,8 +372,8 @@ CRGB PINK = CRGB(<span class="c-n">255</span>, <span class="c-n">20</span>, <spa
   <section class="fixes panel" id="fixes" data-form="drift" data-scene="ribbon" data-led="exit">
     <div class="wrap">
       <header class="sec-head">
-        <h2 class="h2">막혔던 여덟 번,<br>풀어낸 여덟 번</h2>
-        <p class="lede">계획대로만 되지 않았습니다. 원인을 찾고 해결한 기록입니다.</p>
+        <h2 class="h2">문제 해결 과정</h2>
+        <p class="lede">개발 중 발생한 문제와 해결 방법을 정리했습니다.</p>
       </header>
       <div class="board" role="table" aria-label="개발 과정 주요 문제와 해결">
         <div class="board__head" role="row"><span role="columnheader">문제</span><span role="columnheader">원인</span><span role="columnheader">해결</span></div>
@@ -392,12 +393,12 @@ CRGB PINK = CRGB(<span class="c-n">255</span>, <span class="c-n">20</span>, <spa
   <section class="results" id="results" data-form="column" data-scene="ribbon" data-led="fill">
     <div class="wrap">
       <header class="sec-head">
-        <h2 class="h2">시연 가능한 시제품,<br>끝까지 완성</h2>
-        <p class="lede">지하철 배려석 구조를 본뜬 실물과 웹 모니터링을 모두 완성해, 접근부터 하차까지 한 번에 시연할 수 있습니다.</p>
+        <h2 class="h2">개발 결과</h2>
+        <p class="lede">지하철 배려석 구조를 본뜬 실물과<br class="m-br">웹 모니터링을 모두 완성해,<br>접근부터 하차까지 한 번에 시연할 수 있습니다.</p>
       </header>
 
       <div class="done" id="done">
-        <p class="done__line">하드웨어 제작, 소프트웨어, 웹, 통합 시연까지 <b>네 갈래 모두 완료</b>했습니다.</p>
+        <p class="done__line">하드웨어 제작, 소프트웨어,<br class="m-br">웹 개발, 통합 시연을<br><b>모두 완료</b>했습니다.</p>
         <span class="dots" aria-hidden="true"></span>
         <p class="fineprint">결과보고서 기준 진행도 · 점 80개는 바닥 조명의 LED 80개입니다.</p>
       </div>
@@ -406,10 +407,10 @@ CRGB PINK = CRGB(<span class="c-n">255</span>, <span class="c-n">20</span>, <spa
         <div>
           <h3 class="h3">해낸 것</h3>
           <ul class="ticks">
-            <li>BLE 근접 감지, NFC 착석 확인, LED 상태 표시, 웹 연동을 ESP32 한 보드에서 통합</li>
+            <li>BLE 근접 감지, NFC 착석 확인,<br class="m-br">LED 상태 표시, 웹 연동을<br>ESP32 한 보드에서 통합</li>
             <li>지하철 배려석을 본뜬 실물 시제품과 웹 모니터링 시스템 완성</li>
-            <li>Firebase로 좌석 상태를 원격에서 실시간 확인, 시연 모드로 단독 시연 가능</li>
-            <li>LED 전원 분리, NFC 접촉 불량, 라이브러리 변경 대응 등 실제 임베디드 문제 해결</li>
+            <li>Firebase로 좌석 상태를 원격에서 실시간 확인,<br>시연 모드로 단독 시연 가능</li>
+            <li>LED 전원 분리, NFC 접촉 불량,<br class="m-br">라이브러리 변경 대응 등<br>실제 임베디드 문제 해결</li>
           </ul>
         </div>
         <div>
@@ -474,12 +475,12 @@ CRGB PINK = CRGB(<span class="c-n">255</span>, <span class="c-n">20</span>, <spa
   <svg class="linewrite end__word" id="endWord" aria-hidden="true"><text x="0" y="0">감사합니다</text></svg>
   <p class="sr-only">감사합니다</p>
   <p class="end__line">PP3S · 임산부 배려석 양보 유도 시스템 · 팀 양보해조</p>
-  <p class="end__note">이 시제품은 캡스톤 디자인 과정에서 만든 연구용 시제품이며, 실제 지하철에 설치된 서비스가 아닙니다.</p>
+  <p class="end__note">이 시제품은 캡스톤 디자인 과정에서 만든 연구용 시제품이며,<br>실제 지하철에 설치된 서비스가 아닙니다.</p>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" defer></script>
-<script src="js/scene.js?v=24" defer></script>
-<script src="js/main.js?v=24" defer></script>
+<script src="js/scene.js?v=26" defer></script>
+<script src="js/main.js?v=26" defer></script>
 </body>
 </html>
